@@ -107,7 +107,7 @@ class pdf_azurSGST extends ModelePDFPropales
 		$this->posxdesc=$this->marge_gauche+1;
 		if($conf->global->PRODUCT_USE_UNITS)
 		{
-			$this->posxtva=90;
+			$this->posxlocaltax2=90;
 			$this->posxlocaltax1=100;
 			$this->posxup=120;
 			$this->posxqty=130;
@@ -115,19 +115,19 @@ class pdf_azurSGST extends ModelePDFPropales
 		}
 		else
 		{
-			$this->posxtva=98;
+			$this->posxlocaltax2=98;
 			$this->posxlocaltax1=111;
 			$this->posxup=123;
 			$this->posxqty=145;
 		}
 		$this->posxdiscount=162;
 		$this->postotalht=174;
-		if (! empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT) || ! empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT_COLUMN)) $this->posxtva=$this->posxup;
-		$this->posxpicture=$this->posxtva - (empty($conf->global->MAIN_DOCUMENTS_WITH_PICTURE_WIDTH)?20:$conf->global->MAIN_DOCUMENTS_WITH_PICTURE_WIDTH);	// width of images
+		if (! empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT) || ! empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT_COLUMN)) $this->posxlocaltax2=$this->posxup;
+		$this->posxpicture=$this->posxlocaltax2 - (empty($conf->global->MAIN_DOCUMENTS_WITH_PICTURE_WIDTH)?20:$conf->global->MAIN_DOCUMENTS_WITH_PICTURE_WIDTH);	// width of images
 		if ($this->page_largeur < 210) // To work with US executive format
 		{
 			$this->posxpicture-=20;
-			$this->posxtva-=20;
+			$this->posxlocaltax2-=20;
 			$this->posxlocaltax1-=20;
 			$this->posxup-=20;
 			$this->posxqty-=20;
@@ -229,7 +229,7 @@ class pdf_azurSGST extends ModelePDFPropales
 			}
 		}
 
-		if (count($realpatharray) == 0) $this->posxpicture=$this->posxtva;
+		if (count($realpatharray) == 0) $this->posxpicture=$this->posxlocaltax2;
 
 		if ($conf->propal->dir_output)
 		{
@@ -314,7 +314,7 @@ class pdf_azurSGST extends ModelePDFPropales
 				if (empty($this->atleastonediscount) && empty($conf->global->PRODUCT_USE_UNITS))
 				{
 					$this->posxpicture+=($this->postotalht - $this->posxdiscount);
-					$this->posxtva+=($this->postotalht - $this->posxdiscount);
+					$this->posxlocaltax2+=($this->postotalht - $this->posxdiscount);
 					$this->posxlocaltax1+=($this->postotalht - $this->posxdiscount);
 					$this->posxup+=($this->postotalht - $this->posxdiscount);
 					$this->posxqty+=($this->postotalht - $this->posxdiscount);
@@ -447,7 +447,7 @@ class pdf_azurSGST extends ModelePDFPropales
 					if (isset($imglinesize['width']) && isset($imglinesize['height']))
 					{
 						$curX = $this->posxpicture-1;
-						$pdf->Image($realpatharray[$i], $curX + (($this->posxtva-$this->posxpicture-$imglinesize['width'])/2), $curY, $imglinesize['width'], $imglinesize['height'], '', '', '', 2, 300);	// Use 300 dpi
+						$pdf->Image($realpatharray[$i], $curX + (($this->posxlocaltax2-$this->posxpicture-$imglinesize['width'])/2), $curY, $imglinesize['width'], $imglinesize['height'], '', '', '', 2, 300);	// Use 300 dpi
 						// $pdf->Image does not increase value return by getY, so we save it manually
 						$posYAfterImage=$curY+$imglinesize['height'];
 					}
@@ -509,7 +509,7 @@ class pdf_azurSGST extends ModelePDFPropales
 					if (empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT) && empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT_COLUMN))
 					{
 						$vat_rate = pdf_getlinevatrate($object, $i, $outputlangs, $hidedetails);
-						$pdf->SetXY($this->posxtva, $curY);
+						$pdf->SetXY($this->posxlocaltax2, $curY);
 						$pdf->MultiCell($this->posxup-$this->posxlocaltax1-0.8, 3, $vat_rate, 0, 'R');
 					}
 					
@@ -517,8 +517,8 @@ class pdf_azurSGST extends ModelePDFPropales
 					if (empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT) && empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT_COLUMN))
 					{
 						$vat_rate = pdf_getlinevatrate($object, $i, $outputlangs, $hidedetails);
-						$pdf->SetXY($this->posxtva, $curY);
-						$pdf->MultiCell($this->posxup-$this->posxtva-0.8, 3, $vat_rate, 0, 'R');
+						$pdf->SetXY($this->posxlocaltax2, $curY);
+						$pdf->MultiCell($this->posxup-$this->posxlocaltax2-0.8, 3, $vat_rate, 0, 'R');
 					}
 
 					// Unit price before discount
@@ -1318,11 +1318,11 @@ class pdf_azurSGST extends ModelePDFPropales
 		
 		if (empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT) && empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT_COLUMN))
 		{
-			$pdf->line($this->posxtva-1, $tab_top, $this->posxtva-1, $tab_top + $tab_height);
+			$pdf->line($this->posxlocaltax2-1, $tab_top, $this->posxlocaltax2-1, $tab_top + $tab_height);
 			if (empty($hidetop))
 			{
-				$pdf->SetXY($this->posxtva-3, $tab_top+1);
-				$pdf->MultiCell($this->posxlocaltax1-$this->posxtva+3,2, $outputlangs->transnoentities("SGST"),'','C');
+				$pdf->SetXY($this->posxlocaltax2-3, $tab_top+1);
+				$pdf->MultiCell($this->posxlocaltax1-$this->posxlocaltax2+3,2, $outputlangs->transnoentities("SGST"),'','C');
 			}
 
 		

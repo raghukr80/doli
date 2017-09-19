@@ -103,18 +103,18 @@ class pdf_auroreSGST extends ModelePDFSupplierProposal
 
 		// Define position of columns
 		$this->posxdesc=$this->marge_gauche+1;
-		$this->posxtva=90;
+		$this->posxlocaltax2=90;
 		$this->posxlocaltax1=102;
 		$this->posxup=126;
 		$this->posxqty=145;
 		$this->posxdiscount=162;
 		$this->postotalht=174;
-		if (! empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT) || ! empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT_COLUMN)) $this->posxtva=$this->posxup;
-		$this->posxpicture=$this->posxtva - (empty($conf->global->MAIN_DOCUMENTS_WITH_PICTURE_WIDTH)?20:$conf->global->MAIN_DOCUMENTS_WITH_PICTURE_WIDTH);	// width of images
+		if (! empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT) || ! empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT_COLUMN)) $this->posxlocaltax2=$this->posxup;
+		$this->posxpicture=$this->posxlocaltax2 - (empty($conf->global->MAIN_DOCUMENTS_WITH_PICTURE_WIDTH)?20:$conf->global->MAIN_DOCUMENTS_WITH_PICTURE_WIDTH);	// width of images
 		if ($this->page_largeur < 210) // To work with US executive format
 		{
 			$this->posxpicture-=20;
-			$this->posxtva-=20;
+			$this->posxlocaltax2-=20;
 			$this->posxlocaltax1-=20;
 			$this->posxup-=20;
 			$this->posxqty-=20;
@@ -192,7 +192,7 @@ class pdf_auroreSGST extends ModelePDFSupplierProposal
 				if ($realpath) $realpatharray[$i]=$realpath;
 			}
 		}
-		if (count($realpatharray) == 0) $this->posxpicture=$this->posxtva;
+		if (count($realpatharray) == 0) $this->posxpicture=$this->posxlocaltax2;
 
 		if ($conf->supplier_proposal->dir_output)
 		{
@@ -280,7 +280,7 @@ class pdf_auroreSGST extends ModelePDFSupplierProposal
 				if (empty($this->atleastonediscount))
 				{
 					$this->posxpicture+=($this->postotalht - $this->posxdiscount);
-					$this->posxtva+=($this->postotalht - $this->posxdiscount);
+					$this->posxlocaltax2+=($this->postotalht - $this->posxdiscount);
 					$this->posxlocaltax1+=($this->postotalht - $this->posxdiscount);
 					$this->posxup+=($this->postotalht - $this->posxdiscount);
 					$this->posxqty+=($this->postotalht - $this->posxdiscount);
@@ -374,7 +374,7 @@ class pdf_auroreSGST extends ModelePDFSupplierProposal
 					if (isset($imglinesize['width']) && isset($imglinesize['height']))
 					{
 						$curX = $this->posxpicture-1;
-						$pdf->Image($realpatharray[$i], $curX + (($this->posxtva-$this->posxpicture-$imglinesize['width'])/2), $curY, $imglinesize['width'], $imglinesize['height'], '', '', '', 2, 300);	// Use 300 dpi
+						$pdf->Image($realpatharray[$i], $curX + (($this->posxlocaltax2-$this->posxpicture-$imglinesize['width'])/2), $curY, $imglinesize['width'], $imglinesize['height'], '', '', '', 2, 300);	// Use 300 dpi
 						// $pdf->Image does not increase value return by getY, so we save it manually
 						$posYAfterImage=$curY+$imglinesize['height'];
 					}
@@ -1147,11 +1147,11 @@ class pdf_auroreSGST extends ModelePDFSupplierProposal
 		if (empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT))
 		{
 			//$pdf->line($this->posxtva-1, $tab_top, $this->posxtva-1, $tab_top + $tab_height);
-			$pdf->line($this->posxtva-2, $tab_top, $this->posxtva-2, $tab_top + $tab_height);
+			$pdf->line($this->posxlocaltax2-2, $tab_top, $this->posxlocaltax2-2, $tab_top + $tab_height);
 			if (empty($hidetop))
 			{
-				$pdf->SetXY($this->posxtva-5, $tab_top+1);
-				$pdf->MultiCell($this->posxlocaltax1-$this->posxtva+3,2, $outputlangs->transnoentities("SGST"),'','C');
+				$pdf->SetXY($this->posxlocaltax2-5, $tab_top+1);
+				$pdf->MultiCell($this->posxlocaltax1-$this->posxlocaltax2+3,2, $outputlangs->transnoentities("SGST"),'','C');
 			}
 			
 			$pdf->line($this->posxlocaltax1-2, $tab_top, $this->posxlocaltax1-2, $tab_top + $tab_height);

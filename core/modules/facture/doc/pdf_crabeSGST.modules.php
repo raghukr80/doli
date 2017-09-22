@@ -211,7 +211,7 @@ class pdf_crabeSGST extends ModelePDFFactures
 				if ($realpath) $realpatharray[$i]=$realpath;
 			}
 		}
-		if (count($realpatharray) == 0) $this->posxpicture=$this->posxtva;
+		if (count($realpatharray) == 0) $this->posxpicture=$this->posxlocaltax2;
 
 		if ($conf->facture->dir_output)
 		{
